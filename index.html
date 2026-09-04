@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0b0c0f">
+<title>Diario de Entrenos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=4">
+</head>
+<body>
+
+<div id="loading-overlay" hidden><div class="spinner"></div></div>
+
+<!-- =================== PANTALLA DE LOGIN =================== -->
+<div id="auth-gate" class="auth-gate" hidden>
+  <div class="auth-box">
+    <div class="brand-row">
+      <div class="logo-mark">
+        <svg width="22" height="22" viewBox="0 0 24 24"><path d="M13 3L4 14h6l-1 7 9-11h-6l1-7z" fill="#0b0c0f"/></svg>
+      </div>
+      <div>
+        <h1>Diario de Entrenos</h1>
+        <p class="eyebrow">Running · Fuerza · Progreso</p>
+      </div>
+    </div>
+
+    <p class="auth-intro">Entra para ver tus entrenos. Tus datos son solo tuyos: nadie más puede leerlos.</p>
+
+    <button id="btn-google" class="btn-google">Entrar con Google</button>
+
+    <div class="auth-sep"><span>o con tu correo</span></div>
+
+    <form id="form-auth" class="auth-form">
+      <label>Correo
+        <input type="email" name="email" autocomplete="email" required placeholder="tu@correo.com">
+      </label>
+      <label>Contraseña
+        <input type="password" name="password" autocomplete="current-password" required minlength="6" placeholder="mínimo 6 caracteres">
+      </label>
+      <button type="submit" class="btn-primary" id="btn-auth-submit">Entrar</button>
+    </form>
+
+    <p id="auth-error" class="auth-error" hidden></p>
+
+    <p class="auth-toggle">
+      <span id="auth-toggle-texto">¿No tienes cuenta?</span>
+      <button type="button" id="btn-auth-modo" class="btn-link">Crear una</button>
+      <br>
+      <button type="button" id="btn-reset" class="btn-link btn-quiet">He olvidado la contraseña</button>
+    </p>
+  </div>
+</div>
+
+<!-- =================== APLICACIÓN =================== -->
+<div id="app" hidden>
+
+  <header class="app-header">
+    <div class="brand-row">
+      <div class="logo-mark">
+        <svg width="22" height="22" viewBox="0 0 24 24"><path d="M13 3L4 14h6l-1 7 9-11h-6l1-7z" fill="#0b0c0f"/></svg>
+      </div>
+      <div>
+        <h1>Diario de Entrenos</h1>
+        <p class="eyebrow">Running · Fuerza · Progreso</p>
+      </div>
+    </div>
+    <button id="btn-chip-usuario" class="chip-usuario">
+      <span class="avatar" id="usuario-inicial">·</span>
+      <span id="usuario-nombre">Cuenta</span>
+    </button>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab-btn active" data-tab="resumen">Resumen</button>
+    <button class="tab-btn" data-tab="records">Récords</button>
+    <button class="tab-btn" data-tab="running">Running</button>
+    <button class="tab-btn" data-tab="fuerza">Fuerza</button>
+    <button class="tab-btn" data-tab="semana">Semana</button>
+    <button class="tab-btn" data-tab="historial">Historial</button>
+    <button class="tab-btn" data-tab="cuenta">Cuenta</button>
+  </nav>
+
+  <main>
+
+    <!-- ============ RESUMEN ============ -->
+    <section id="resumen" class="tab-panel active">
+      <div class="grid-hero">
+        <div class="panel panel-racha">
+          <p class="eyebrow">Racha activa</p>
+          <div class="racha-num">
+            <strong id="racha-semanas">0</strong>
+            <span id="racha-texto">semanas cumpliendo objetivo</span>
+          </div>
+          <div class="semana-dias" id="semana-dias"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <p class="eyebrow">Objetivos de la semana</p>
+            <span class="eyebrow accent-2" id="objetivos-resumen"></span>
+          </div>
+          <div class="barras-objetivo" id="objetivos-lista"></div>
+        </div>
+      </div>
+
+      <div class="cards" id="cards-resumen"></div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Ritmo y volumen</h2>
+          <div class="leyenda">
+            <span class="accent">— Ritmo min/km</span>
+            <span class="accent-2">▮ Km por semana</span>
+          </div>
+        </div>
+        <p class="nota" id="nota-tendencia"></p>
+        <svg id="chart-combo" class="chart" viewBox="0 0 620 280" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <h2>Zonas de frecuencia cardíaca</h2>
+          <p class="nota" id="nota-zonas"></p>
+          <div class="zonas-barra" id="zonas-barra"></div>
+          <div class="zonas-lista" id="zonas-lista"></div>
+        </div>
+        <div class="panel">
+          <h2>Volumen de fuerza</h2>
+          <p class="nota">Kg totales por sesión — últimas 8</p>
+          <svg id="chart-volumen" class="chart" viewBox="0 0 560 220" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ RÉCORDS ============ -->
+    <section id="records" class="tab-panel">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Récords personales</h2>
+          <button class="btn-link" id="btn-pr-manual">Añadir a mano</button>
+        </div>
+        <p class="nota">Calculados con tus entrenos. Un entreno de la distancia justa da el récord exacto; si fue más largo, se estima con tu ritmo medio.</p>
+        <div class="cards-pr" id="lista-records"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Objetivos a largo plazo</h2>
+          <button class="btn-link" id="btn-nueva-meta">Nueva meta</button>
+        </div>
+        <div class="metas" id="lista-metas"></div>
+      </div>
+    </section>
+
+    <!-- ============ RUNNING ============ -->
+    <section id="running" class="tab-panel">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Nuevo entreno</h2>
+          <button class="btn-link" id="btn-importar-archivo">Importar .gpx / .tcx</button>
+        </div>
+        <input type="file" id="input-archivo" accept=".gpx,.tcx,.xml" hidden>
+        <p class="nota" id="nota-import" hidden></p>
+
+        <form id="form-running">
+          <div class="form-grid">
+            <label>Fecha
+              <input type="date" name="fecha" required>
+            </label>
+            <label>Distancia (km)
+              <input type="number" step="0.01" min="0" name="distancia" required inputmode="decimal" placeholder="8,20">
+            </label>
+            <label>Duración (min)
+              <input type="number" step="0.1" min="0" name="duracion" required inputmode="decimal" placeholder="46">
+            </label>
+            <label>Tipo
+              <select name="tipo">
+                <option value="Rodaje">Rodaje suave</option>
+                <option value="Series">Series / Interválico</option>
+                <option value="Tempo">Tempo</option>
+                <option value="Largo">Fondo largo</option>
+                <option value="CACO">CACO</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </label>
+          </div>
+
+          <p class="eyebrow campo-titulo">Esfuerzo percibido (RPE)</p>
+          <div class="escala" id="escala-rpe"></div>
+          <input type="hidden" name="rpe" value="6">
+
+          <button type="button" class="btn-desplegar" id="btn-avanzado">+ FC, dolor y notas</button>
+
+          <div class="form-grid" id="campos-avanzados" hidden>
+            <label>FC media (ppm)
+              <input type="number" min="0" max="250" name="fcMedia" inputmode="numeric" placeholder="150">
+            </label>
+            <label>FC máxima (ppm)
+              <input type="number" min="0" max="250" name="fcMaxima" inputmode="numeric" placeholder="175">
+            </label>
+            <label>Rodilla (0-10)
+              <input type="number" min="0" max="10" name="rodilla" value="0" inputmode="numeric">
+            </label>
+            <label>Dolor en otro sitio (0-10)
+              <input type="number" min="0" max="10" name="dolorValor" value="0" inputmode="numeric">
+            </label>
+            <label class="full">Zona del dolor
+              <input type="text" name="dolorZona" placeholder="gemelo, cadera… (vacío si no hay)">
+            </label>
+            <label class="full">Sensaciones
+              <textarea name="notas" rows="2" placeholder="Clima, terreno, cómo te sentiste…"></textarea>
+            </label>
+          </div>
+
+          <button type="submit" class="btn-primary btn-ancho">Guardar entreno</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h2>Últimos entrenos</h2>
+        <div id="lista-running" class="lista"></div>
+      </div>
+    </section>
+
+    <!-- ============ FUERZA ============ -->
+    <section id="fuerza" class="tab-panel">
+      <div class="panel">
+        <h2>Sesión de fuerza</h2>
+        <p class="nota">Añade ejercicios uno a uno y guarda la sesión entera al final.</p>
+        <form id="form-fuerza">
+          <div class="form-grid">
+            <label class="full">Fecha
+              <input type="date" name="fecha" required>
+            </label>
+            <label class="full">Ejercicio
+              <input type="text" name="ejercicio" placeholder="Sentadilla, press banca…" list="lista-ejercicios">
+              <datalist id="lista-ejercicios"></datalist>
+            </label>
+            <label>Series
+              <input type="number" min="1" name="series" value="3" inputmode="numeric">
+            </label>
+            <label>Reps
+              <input type="number" min="1" name="reps" value="10" inputmode="numeric">
+            </label>
+            <label>Peso (kg)
+              <input type="number" step="0.5" min="0" name="peso" inputmode="decimal" placeholder="60">
+            </label>
+            <label class="full">Notas
+              <textarea name="notas" rows="2" placeholder="RPE, técnica, sensaciones…"></textarea>
+            </label>
+          </div>
+          <button type="button" id="btn-anadir-ejercicio" class="btn-secundario btn-ancho">Añadir ejercicio a la sesión</button>
+
+          <p class="eyebrow campo-titulo">En esta sesión</p>
+          <div id="lista-pendientes" class="lista"></div>
+
+          <button type="submit" class="btn-primary btn-ancho" id="btn-guardar-sesion" disabled>Guardar sesión completa</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h2>Progresión por ejercicio</h2>
+        <p class="nota" id="nota-progresion">Peso levantado y 1RM estimado</p>
+        <div class="pills" id="pills-ejercicios"></div>
+        <svg id="chart-ejercicio" class="chart" viewBox="0 0 620 250" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="leyenda leyenda-abajo">
+          <span class="accent">— Peso levantado</span>
+          <span class="accent-2">·· 1RM estimado</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Últimas sesiones</h2>
+        <div id="lista-fuerza" class="lista"></div>
+      </div>
+    </section>
+
+    <!-- ============ SEMANA ============ -->
+    <section id="semana" class="tab-panel">
+      <div class="panel">
+        <h2>Check-in semanal</h2>
+        <p class="nota">Una vez por semana. Los campos que la app puede calcular vienen ya rellenos.</p>
+        <form id="form-semana">
+          <div class="form-grid">
+            <label>Semana del
+              <input type="date" name="fecha" required>
+              <span class="hint" id="hint-fecha">Lunes de esta semana</span>
+            </label>
+            <label>Peso (kg)
+              <input type="number" step="0.1" min="0" name="peso" inputmode="decimal" placeholder="73,8">
+              <span class="hint" id="hint-peso">Escríbelo tú</span>
+            </label>
+            <label>Km de carrera
+              <input type="number" step="0.1" min="0" name="kmTotales" inputmode="decimal">
+              <span class="hint accent">Calculado de tus entrenos</span>
+            </label>
+            <label>Sesiones completadas
+              <input type="number" min="0" name="entrenosCompletados" inputmode="numeric">
+              <span class="hint accent">Calculado de tus entrenos</span>
+            </label>
+            <label>Sesiones planeadas
+              <input type="number" min="0" name="entrenosPlaneados" inputmode="numeric">
+            </label>
+            <label>Sueño medio (h)
+              <input type="number" step="0.1" min="0" name="suenoHoras" inputmode="decimal" placeholder="7,2">
+            </label>
+            <label>Calidad del sueño (1-5)
+              <input type="number" min="1" max="5" name="suenoCalidad" value="3" inputmode="numeric">
+            </label>
+            <label>Fatiga (0-10)
+              <input type="number" min="0" max="10" name="fatiga" value="4" inputmode="numeric">
+            </label>
+            <label>Dolor (0-10)
+              <input type="number" min="0" max="10" name="dolorValor" value="0" inputmode="numeric">
+            </label>
+            <label>Zona del dolor
+              <input type="text" name="dolorZona" placeholder="rodilla, espalda…">
+            </label>
+            <label class="full">Algo destacable
+              <textarea name="destacable" rows="2" placeholder="Lo que quieras recordar de esta semana…"></textarea>
+            </label>
+          </div>
+          <button type="submit" class="btn-primary btn-ancho">Guardar check-in</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h2>Semanas anteriores</h2>
+        <div id="lista-semanas" class="lista"></div>
+      </div>
+    </section>
+
+    <!-- ============ HISTORIAL ============ -->
+    <section id="historial" class="tab-panel">
+      <div class="panel">
+        <h2>Historial completo</h2>
+        <div class="pills" id="filtros-historial">
+          <button class="pill active" data-filtro="todos">Todos</button>
+          <button class="pill" data-filtro="running">Running</button>
+          <button class="pill" data-filtro="fuerza">Fuerza</button>
+        </div>
+        <div id="lista-historial" class="lista lista-alta"></div>
+      </div>
+    </section>
+
+    <!-- ============ CUENTA ============ -->
+    <section id="cuenta" class="tab-panel">
+      <div class="panel panel-cuenta">
+        <span class="avatar avatar-grande" id="cuenta-inicial">·</span>
+        <div class="cuenta-info">
+          <div class="cuenta-nombre" id="cuenta-nombre">—</div>
+          <div class="nota" id="cuenta-email">—</div>
+        </div>
+        <button id="btn-salir" class="btn-secundario btn-salir">Cerrar sesión</button>
+      </div>
+
+      <div class="panel">
+        <h2>Tu perfil de entrenamiento</h2>
+        <p class="nota">Con esto se calculan las zonas de FC, la racha y el progreso de tus objetivos.</p>
+        <form id="form-perfil">
+          <div class="form-grid">
+            <label>Nombre
+              <input type="text" name="nombre" placeholder="Tu nombre">
+            </label>
+            <label>FC máxima (ppm)
+              <input type="number" min="120" max="230" name="fcMax" placeholder="190" inputmode="numeric">
+              <span class="hint">Si la dejas vacía se estima con 220 − edad</span>
+            </label>
+            <label>Edad
+              <input type="number" min="10" max="99" name="edad" inputmode="numeric" placeholder="34">
+            </label>
+            <label>Objetivo semanal (km)
+              <input type="number" min="0" step="0.5" name="objetivoKm" placeholder="42" inputmode="decimal">
+            </label>
+            <label>Sesiones por semana
+              <input type="number" min="0" max="14" name="objetivoSesiones" placeholder="6" inputmode="numeric">
+            </label>
+          </div>
+          <button type="submit" class="btn-primary btn-ancho">Guardar perfil</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h2>Importar entrenos</h2>
+        <p class="nota">Exporta la actividad de tu reloj o de Strava como <strong>.gpx</strong> o <strong>.tcx</strong> y súbela aquí: se calculan distancia, duración y FC media automáticamente.</p>
+        <div class="fuentes">
+          <div class="fuente">
+            <div class="fuente-head">
+              <span class="fuente-nombre">Archivo .gpx / .tcx</span>
+              <span class="chip chip-on">Listo</span>
+            </div>
+            <p class="nota">Funciona ya, sin configurar nada. Una actividad por archivo.</p>
+            <button class="btn-primary btn-ancho" id="btn-importar-cuenta">Subir archivo</button>
+          </div>
+          <div class="fuente">
+            <div class="fuente-head">
+              <span class="fuente-nombre">Strava (automático)</span>
+              <span class="chip">Requiere servidor</span>
+            </div>
+            <p class="nota">La conexión automática necesita una clave secreta que no puede vivir en el navegador. Hasta entonces, exporta el GPX desde Strava y súbelo aquí.</p>
+            <button class="btn-secundario btn-ancho" disabled>Sin conectar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Tus datos</h2>
+        <p class="nota">Guardados en la nube y ligados a tu cuenta.</p>
+        <div class="acciones">
+          <button id="btn-exportar" class="btn-secundario">Exportar copia (.json)</button>
+          <button id="btn-migrar" class="btn-secundario" hidden>Traer mis datos antiguos</button>
+          <button id="btn-borrar" class="btn-peligro">Borrar todos mis datos</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ============ DIÁLOGO GENÉRICO ============ -->
+<div id="modal" class="modal-overlay" hidden>
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 id="modal-titulo">—</h3>
+      <button class="btn-cerrar" id="modal-cerrar" aria-label="Cerrar">✕</button>
+    </div>
+    <form id="modal-form">
+      <div class="form-grid" id="modal-campos"></div>
+      <button type="submit" class="btn-primary btn-ancho">Guardar</button>
+    </form>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="app.js?v=4"></script>
+</body>
+</html>
