@@ -540,7 +540,7 @@ textarea { resize: vertical; min-height: 62px; }
 }
 
 /* ---------- Gráficas ---------- */
-.chart { width: 100%; height: auto; overflow: visible; display: block; margin-top: 10px; }
+.chart { width: 100%; height: auto; overflow: visible; display: block; margin: 10px 0 4px; }
 .chart .grid-line { stroke: rgba(255, 255, 255, .06); stroke-width: 1; }
 .chart .grid-label { fill: var(--dim-2); font-size: 10px; font-weight: 700; font-family: var(--sans); }
 .chart .linea { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
@@ -557,6 +557,9 @@ textarea { resize: vertical; min-height: 62px; }
 .chart .etiqueta-objetivo { fill: var(--accent-2); font-size: 9.5px; font-weight: 800; letter-spacing: .06em; }
 .chart .tag-fondo { fill: var(--accent); }
 .chart .tag-texto { fill: var(--bg); font-size: 11px; font-weight: 700; font-family: var(--display); }
+.chart .eje-titulo { font-size: 9px; font-weight: 800; letter-spacing: .1em; font-family: var(--sans); }
+.chart .eje-km { fill: var(--accent-2); }
+.chart .eje-ritmo { fill: var(--accent); }
 .chart .sin-datos { fill: var(--dim); font-size: 13px; font-weight: 600; font-family: var(--sans); }
 
 /* ---------- Cuenta ---------- */

@@ -404,7 +404,7 @@ function graficaCombo() {
   const semanas = kmPorSemana().slice(-8);
   if (!semanas.length) return sinDatos(svg, 'Registra tu primer entreno para ver la evolución', 620, 280);
 
-  const L = 46, R = 600, T = 24, B = 244, W = R - L, H = B - T;
+  const L = 52, R = 552, T = 24, B = 244, W = R - L, H = B - T;
   const objetivo = datos.perfil.objetivoKm || 0;
   const maxKm = Math.max(objetivo, ...semanas.map(s => s.km)) * 1.14;
   const paso = W / semanas.length;
@@ -413,7 +413,8 @@ function graficaCombo() {
   // escala del ritmo: se calcula antes de las barras para poder esquivar
   // las etiquetas que caigan justo encima de un punto de la línea
   const rs = semanas.map(s => s.ritmo).filter(Boolean);
-  const rMin = Math.min(...rs) - .16, rMax = Math.max(...rs) + .16;
+  const rMin = rs.length ? Math.min(...rs) - .16 : 0;
+  const rMax = rs.length ? Math.max(...rs) + .16 : 1;
   const px = i => L + i * paso + paso / 2;
   const py = v => T + 14 + (1 - (v - rMin) / (rMax - rMin)) * (H - 46);
   const ritmoY = semanas.map(s => (s.ritmo ? py(s.ritmo) : null));
@@ -421,10 +422,30 @@ function graficaCombo() {
   [0, .25, .5, .75].forEach(t => {
     const y = B - t * H;
     svg.appendChild(svgEl('line', { x1: L, y1: y, x2: R, y2: y, class: 'grid-line' }));
-    const et = svgEl('text', { x: L - 6, y: y + 3.5, 'text-anchor': 'end', class: 'grid-label' });
-    et.textContent = `${Math.round(t * maxKm)}km`;
+    const et = svgEl('text', { x: L - 8, y: y + 3.5, 'text-anchor': 'end', class: 'grid-label eje-km' });
+    et.textContent = `${Math.round(t * maxKm)}`;
     svg.appendChild(et);
   });
+
+  // rótulos de los dos ejes
+  const tituloKm = svgEl('text', { x: L - 8, y: T - 8, 'text-anchor': 'end', class: 'eje-titulo eje-km' });
+  tituloKm.textContent = 'KM';
+  svg.appendChild(tituloKm);
+
+  // eje derecho: ritmo min/km (más arriba = más rápido)
+  if (rs.length) {
+    const tituloR = svgEl('text', { x: R + 8, y: T - 8, class: 'eje-titulo eje-ritmo' });
+    tituloR.textContent = 'MIN/KM';
+    svg.appendChild(tituloR);
+    [0, .34, .67, 1].forEach(t => {
+      const v = rMin + t * (rMax - rMin);
+      const y = py(v);
+      svg.appendChild(svgEl('line', { x1: R, y1: y, x2: R + 5, y2: y, class: 'grid-line' }));
+      const et = svgEl('text', { x: R + 9, y: y + 3.5, class: 'grid-label eje-ritmo' });
+      et.textContent = fmtRitmo(v);
+      svg.appendChild(et);
+    });
+  }
 
   semanas.forEach((s, i) => {
     const h = Math.max((s.km / maxKm) * H, 2);
@@ -437,7 +458,7 @@ function graficaCombo() {
     const v = svgEl('text', { x: cx, y: ly, 'text-anchor': 'middle', class: 'valor-barra' });
     v.textContent = num(s.km);
     svg.appendChild(v);
-    const et = svgEl('text', { x: cx, y: 272, 'text-anchor': 'middle', class: 'etiqueta' });
+    const et = svgEl('text', { x: cx, y: 268, 'text-anchor': 'middle', class: 'etiqueta' });
     et.textContent = etiquetaSemana(s.iso);
     svg.appendChild(et);
   });
@@ -445,7 +466,7 @@ function graficaCombo() {
   if (objetivo) {
     const y = B - (objetivo / maxKm) * H;
     svg.appendChild(svgEl('path', { d: `M ${L} ${y} L ${R} ${y}`, class: 'objetivo' }));
-    const et = svgEl('text', { x: R, y: y - 7, 'text-anchor': 'end', class: 'etiqueta-objetivo' });
+    const et = svgEl('text', { x: L + 4, y: y - 7, class: 'etiqueta-objetivo' });
     et.textContent = `OBJETIVO ${objetivo} KM`;
     svg.appendChild(et);
   }
