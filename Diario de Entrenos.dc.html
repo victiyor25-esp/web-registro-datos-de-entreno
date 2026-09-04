@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#0b0c0f; color:#f4f3ef; font-family:'Manrope',system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+  a { color:#ff7a1a; text-decoration:none; }
+  a:hover { color:#ffa05e; }
+  ::selection { background:#ff7a1a; color:#0b0c0f; }
+  input,select,textarea,button { font-family:'Manrope',system-ui,sans-serif; }
+  input:focus,select,textarea:focus { outline:none; }
+  select { color-scheme:dark; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+  @keyframes drawIn { from { stroke-dashoffset:1200; } to { stroke-dashoffset:0; } }
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:radial-gradient(900px 520px at 88% -10%,rgba(255,122,26,.16),transparent 62%),radial-gradient(700px 420px at -5% 26%,rgba(182,255,46,.08),transparent 58%),#0b0c0f;padding-bottom:64px">
+
+  <header style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;max-width:1080px;margin:0 auto;padding:24px 18px 8px">
+    <div style="display:flex;align-items:center;gap:13px">
+      <div style="width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,#ff7a1a,#b6ff2e);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 8px 22px rgba(255,122,26,.26)">
+        <svg width="22" height="22" viewBox="0 0 24 24"><path d="M13 3L4 14h6l-1 7 9-11h-6l1-7z" fill="#0b0c0f"></path></svg>
+      </div>
+      <div>
+        <h1 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:clamp(1.15rem,3.6vw,1.45rem);font-weight:700;letter-spacing:-.02em">Diario de Entrenos</h1>
+        <p style="margin:2px 0 0;color:#8e8e8e;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em">Running · Fuerza · Progreso</p>
+      </div>
+    </div>
+    <button onClick="{{ toggleCuenta }}" style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:6px 14px 6px 6px;cursor:pointer;color:#f4f3ef;min-height:44px" style-hover="border-color:rgba(255,122,26,.45)">
+      <span style="width:32px;height:32px;border-radius:999px;background:rgba(255,122,26,.18);color:#ff7a1a;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.8rem">{{ usuario.inicial }}</span>
+      <span style="font-size:.82rem;font-weight:700">{{ usuario.nombre }}</span>
+    </button>
+  </header>
+
+  <nav style="max-width:1080px;margin:0 auto;padding:16px 18px 0;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none">
+    <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="6">
+      <button onClick="{{ t.go }}" style="flex:0 0 auto;border:1px solid rgba(255,255,255,.07);border-radius:999px;padding:11px 20px;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:.85rem;font-weight:700;min-height:44px;white-space:nowrap;transition:all .18s ease;background:{{ t.bg }};color:{{ t.fg }};border-color:{{ t.bc }}">{{ t.label }}</button>
+    </sc-for>
+  </nav>
+
+  <main style="max-width:1080px;margin:0 auto;padding:20px 18px 0;animation:fadeUp .3s ease">
+
+    <!-- ============ RESUMEN ============ -->
+    <sc-if value="{{ esResumen }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:16px">
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
+          <div style="position:relative;overflow:hidden;background:linear-gradient(140deg,rgba(255,122,26,.14),rgba(255,255,255,.03));border:1px solid rgba(255,122,26,.22);border-radius:22px;padding:22px">
+            <p style="margin:0;color:#8e8e8e;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.09em">Racha activa</p>
+            <div style="display:flex;align-items:baseline;gap:9px;margin-top:6px">
+              <span style="font-family:'Space Grotesk',sans-serif;font-size:3rem;line-height:1;font-weight:700;color:#ff7a1a;letter-spacing:-.03em">{{ racha.semanas }}</span>
+              <span style="font-size:.9rem;font-weight:700;color:#c9c9c9">semanas cumpliendo objetivo</span>
+            </div>
+            <div style="display:flex;gap:5px;margin-top:16px">
+              <sc-for list="{{ racha.dias }}" as="d" hint-placeholder-count="7">
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
+                  <div style="width:100%;height:34px;border-radius:8px;background:{{ d.bg }};border:1px solid {{ d.bc }}"></div>
+                  <span style="font-size:.6rem;font-weight:800;color:#7e7e7e;letter-spacing:.06em">{{ d.label }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:22px;padding:22px">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
+              <p style="margin:0;color:#8e8e8e;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.09em">Objetivos de la semana</p>
+              <span style="font-family:'Space Grotesk',sans-serif;font-size:.78rem;font-weight:700;color:#b6ff2e">{{ objetivos.resumen }}</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:14px;margin-top:16px">
+              <sc-for list="{{ objetivos.lista }}" as="o" hint-placeholder-count="3">
+                <div>
+                  <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:6px">
+                    <span style="font-size:.82rem;font-weight:700;color:#d8d8d4">{{ o.nombre }}</span>
+                    <span style="font-family:'Space Grotesk',sans-serif;font-size:.82rem;font-weight:700;color:#f4f3ef">{{ o.valor }}</span>
+                  </div>
+                  <div style="height:8px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden">
+                    <div style="height:100%;border-radius:999px;transition:width .5s ease;width:{{ o.pct }};background:{{ o.color }}"></div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(146px,1fr));gap:12px">
+          <sc-for list="{{ cards }}" as="c" hint-placeholder-count="4">
+            <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:16px 18px">
+              <div style="font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;letter-spacing:-.02em;color:{{ c.color }}">{{ c.valor }}</div>
+              <div style="color:#8e8e8e;font-size:.66rem;font-weight:800;margin-top:4px;text-transform:uppercase;letter-spacing:.08em">{{ c.etiqueta }}</div>
+              <div style="color:#6f6f6f;font-size:.72rem;font-weight:600;margin-top:5px">{{ c.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:22px;padding:22px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:4px">
+            <h2 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700">Ritmo y volumen</h2>
+            <div style="display:flex;gap:16px;font-size:.7rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase">
+              <span style="color:#ff7a1a">— Ritmo min/km</span>
+              <span style="color:#b6ff2e">▮ Km por semana</span>
+            </div>
+          </div>
+          <p style="margin:0 0 8px;color:#8e8e8e;font-size:.78rem">{{ ritmo.tendencia }}</p>
+          <svg viewBox="0 0 620 280" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;overflow:visible;display:block">
+            <sc-for list="{{ combo.grid }}" as="g" hint-placeholder-count="4">
+              <g>
+                <line x1="46" y1="{{ g.y }}" x2="600" y2="{{ g.y }}" stroke="rgba(255,255,255,.06)" stroke-width="1"></line>
+                <text x="40" y="{{ g.ty }}" text-anchor="end" fill="#6f6f6f" font-size="10" font-weight="700">{{ g.label }}</text>
+              </g>
+            </sc-for>
+            <sc-for list="{{ combo.barras }}" as="b" hint-placeholder-count="8">
+              <g>
+                <rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" rx="4" fill="rgba(182,255,46,.24)"></rect>
+                <text x="{{ b.cx }}" y="{{ b.vy }}" text-anchor="middle" fill="#b6ff2e" font-size="10" font-weight="700" font-family="Space Grotesk">{{ b.val }}</text>
+                <text x="{{ b.cx }}" y="272" text-anchor="middle" fill="#6f6f6f" font-size="10" font-weight="700">{{ b.label }}</text>
+              </g>
+            </sc-for>
+            <path d="{{ combo.goalPath }}" stroke="rgba(182,255,46,.55)" stroke-width="1.5" stroke-dasharray="6 6" fill="none"></path>
+            <text x="600" y="{{ combo.goalTy }}" text-anchor="end" fill="#b6ff2e" font-size="9.5" font-weight="800" letter-spacing=".06em">OBJETIVO {{ combo.goalLabel }}</text>
+            <path d="{{ combo.areaPath }}" fill="rgba(255,122,26,.13)"></path>
+            <path d="{{ combo.linePath }}" fill="none" stroke="#ff7a1a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1200" style="animation:drawIn 1.1s ease forwards"></path>
+            <sc-for list="{{ combo.puntos }}" as="p" hint-placeholder-count="8">
+              <circle cx="{{ p.x }}" cy="{{ p.y }}" r="4" fill="#0b0c0f" stroke="#ff7a1a" stroke-width="2.5"></circle>
+            </sc-for>
+            <g>
+              <rect x="{{ combo.tagX }}" y="{{ combo.tagY }}" width="74" height="22" rx="11" fill="#ff7a1a"></rect>
+              <text x="{{ combo.tagTx }}" y="{{ combo.tagTy }}" text-anchor="middle" fill="#0b0c0f" font-size="11" font-weight="700" font-family="Space Grotesk">{{ combo.tagLabel }}</text>
+            </g>
+          </svg>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
+          <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:22px;padding:22px">
+            <h2 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700">Zonas de frecuencia cardíaca</h2>
+            <p style="margin:6px 0 0;color:#8e8e8e;font-size:.78rem">{{ zonas.subtitulo }}</p>
+            <div style="display:flex;height:14px;border-radius:999px;overflow:hidden;margin:16px 0 14px;gap:2px">
+              <sc-for list="{{ zonas.lista }}" as="z" hint-placeholder-count="5">
+                <div style="height:100%;flex-basis:{{ z.pct }};background:{{ z.color }}"></div>
+              </sc-for>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px">
+              <sc-for list="{{ zonas.lista }}" as="z" hint-placeholder-count="5">
+                <div style="display:flex;align-items:center;gap:11px">
+                  <span style="width:9px;height:9px;border-radius:3px;flex-shrink:0;background:{{ z.color }}"></span>
+                  <span style="font-size:.8rem;font-weight:700;color:#d8d8d4;min-width:92px">{{ z.nombre }}</span>
+                  <span style="font-size:.75rem;color:#7e7e7e;flex:1">{{ z.rango }}</span>
+                  <span style="font-family:'Space Grotesk',sans-serif;font-size:.8rem;font-weight:700;color:#f4f3ef">{{ z.tiempo }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:22px;padding:22px">
+            <h2 style="margin:0 0 4px;font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700">Volumen de fuerza</h2>
+            <p style="margin:0 0 10px;color:#8e8e8e;font-size:.78rem">Kg totales por sesión — últimas 8</p>
+            <svg viewBox="0 0 560 220" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;overflow:visible;display:block">
+              <sc-for list="{{ volumen.barras }}" as="b" hint-placeholder-count="8">
+                <g>
+                  <rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" rx="4" fill="{{ b.fill }}"></rect>
+                  <text x="{{ b.cx }}" y="{{ b.vy }}" text-anchor="middle" fill="#c9c9c9" font-size="10" font-weight="700" font-family="Space Grotesk">{{ b.val }}</text>
+                  <text x="{{ b.cx }}" y="212" text-anchor="middle" fill="#6f6f6f" font-size="10" font-weight="700">{{ b.label }}</text>
+                </g>
+              </sc-for>
+              <line x1="10" y1="188" x2="550" y2="188" stroke="rgba(255,255,255,.08)" stroke-width="1"></line>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ RÉCORDS ============ -->
+    <sc-if value="{{ esRecords }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:22px;padding:22px">
+          <h2 style="margin:0 0 4px;font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700">Récords personales</h2>
+          <p style="margin:0 0 18px;color:#8e8e8e;font-size:.78rem">Calculados automáticamente a partir de tus entrenos registrados.</p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px">
+            <sc-for list="{{ records }}" as="r" hint-placeholder-count="4">
+              <div style="border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:18px;background:rgba(255,255,255,.02)">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+                  <span style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:#8e8e8e">{{ r.distancia }}</span>
+                  <span style="font-size:.64rem;font-weight:800;padding:3px 9px;border-radius:999px;background:{{ r.chipBg }};color:{{ r.chipFg }}">{{ r.chip }}</span>
+                </div>
+                <div style="font-family:'Space Grotesk',sans-serif;font-size:1.8rem;font-weight:700;letter-spacing:-.02em;margin-top:8px">{{ r.tiempo }}</div>
+                <div style="color:#7e7e7e;font-size:.76rem;font-weight:600;margin-top:4px">{{ r.ritmo }} · {{ r.fecha }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:22px;padding:22px">
+          <h2 style="margin:0 0 4px;font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700">Objetivos a largo plazo</h2>
+          <p style="margin:0 0 18px;color:#8e8e8e;font-size:.78rem">Define una meta y la app calcula si tu tendencia llega.</p>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <sc-for list="{{ metas }}" as="m" hint-placeholder-count="3">
+              <div style="border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:16px 18px;background:rgba(255,255,255,.02)">
+                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap">
+                  <span style="font-family:'Space Grotesk',sans-serif;font-size:.95rem;font-weight:700">{{ m.nombre }}</span>
+                  <span style="font-size:.72rem;font-weight:800;color:{{ m.estadoColor }}">{{ m.estado }}</span>
+                </div>
+                <div style="height:8px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden;margin:12px 0 8px">
+                  <div style="height:100%;border-radius:999px;width:{{ m.pct }};background:{{ m.color }}"></div>
+                </div>
+                <div style="color:#7e7e7e;font-size:.76rem;font-weight:600">{{ m.detalle }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ RUNNING ============ -->
+    <sc-if value="{{ esRunning }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:22px;padding:22px">
+          <h2 style="margin:0 0 4px;font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700">Nuevo entreno</h2>
+          <p style="margin:0 0 18px;color:#8e8e8e;font-size:.78rem">Lo esencial primero; el resto queda plegado para no alargar el formulario en el móvil.</p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px">
+            <label style="display:flex;flex-direction:column;gap:7px;font-size:.68rem;font-weight:800;color:#8e8e8e;text-transform:uppercase;letter-spacing:.07em">Fecha
+              <input type="date" value="2026-09-03" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#f4f3ef;padding:12px 13px;border-radius:14px;font-size:.95rem;min-height:46px" style-focus="border-color:#ff7a1a;background:rgba(255,122,26,.06)">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:7px;font-size:.68rem;font-weight:800;color:#8e8e8e;text-transform:uppercase;letter-spacing:.07em">Distancia (km)
+              <input type="number" step="0.01" placeholder="8,20" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#f4f3ef;padding:12px 13px;border-radius:14px;font-size:.95rem;min-height:46px" style-focus="border-color:#ff7a1a;background:rgba(255,122,26,.06)">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:7px;font-size:.68rem;font-weight:800;color:#8e8e8e;text-transform:uppercase;letter-spacing:.07em">Duración (min)
+              <input type="number" step="0.1" placeholder="46" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#f4f3ef;padding:12px 13px;border-radius:14px;font-size:.95rem;min-height:46px" style-focus="border-color:#ff7a1a;background:rgba(255,122,26,.06)">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:7px;font-size:.68rem;font-weight:800;color:#8e8e8e;text-transform:uppercase;letter-spacing:.07em">Tipo
+              <select style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#f4f3ef;padding:12px 13px;border-radius:14px;font-size:.95rem;min-height:46px;cursor:pointer">
+                <option>Rodaje suave</option>
+                <option>Series / Interválico</option>
+                <option>Tempo</option>
+                <option>Fondo largo</option>
+                <option>CACO</option>
+              </select>
+            </label>
+          </div>
+
+          <div style="margin-top:18px">
+            <p style="margin:0 0 9px;font-size:.68rem;font-weight:800;color:#8e8e8e;text-transform:uppercase;letter-spacing:.07em">Esfuerzo percibido (RPE)</p>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <sc-for list="{{ rpeEscala }}" as="v" hint-placeholder-count="11">
+                <button onClick="{{ v.go }}" style="flex:1 0 auto;min-width:44px;min-height:44px;border-radius:12px;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.9rem;border:1px solid {{ v.bc }};background:{{ v.bg }};color:{{ v.fg }}">{{ v.n }}</button>
+              </sc-for>
+            </div>
+          </div>
+
+          <button onClick="{{ toggleAvanzado }}" style="margin-top:18px;display:flex;align-items:center;gap:8px;background:none;border:none;color:#ff7a1a;font-size:.82rem;font-weight:700;cursor:pointer;padding:6px 0;min-height:40px">{{ avanzadoLabel }}</button>
+
+          <sc-if value="{{ avanzado }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;padding-top:6px">
+              <label style="display:flex;flex-direction:column;gap:7px;font-size:.68rem;font-weight:800;color:#8e8e8e;text-transform:uppercase;letter-spacing:.07em">FC media
+                <input type="number" placeholder="150" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#f4f3ef;padding:12px 13px;border-radius:14px;font-size:.95rem;min-height:46px">
+              </label>
+              <label style="display:flex;flex-direction:column;gap:7px;font-size:.68rem;font-weight:800;color:#8e8e8e;text-transform:uppercase;letter-spacing:.07em">FC máxima
+                <input type="number" placeholder="175" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#f4f3ef;padding:12px 13px;border-radius:14px;font-size:.95rem;min-height:46px">
+              </label>
+              <label style="display:flex;flex-direction:column;gap:7px;font-size:.68rem;font-weight:800;color:#8e8e8e;text-transform:uppercase;letter-spacing:.07em">Rodilla (0-10)
+                <input type="number" value="0" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#f4f3ef;padding:12px 13px;border-radius:14px;font-size:.95rem;min-height:46px">
+              </label>
+              <label style="display:flex;flex-direction:column;gap:7px;font-size:.68rem;font-weight:800;color:#8e8e8e;text-transform:uppercase;letter-spacing:.07em">Zona del dolor
+                <input type="text" placeholder="gemelo, cadera…" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#f4f3ef;padding:12px 13px;border-radius:14px;font-size:.95rem;min-height:46px">
+              </label>
+              <label style="grid-column:1/-1;display:flex;flex-direction:column;gap:7px;font-size:.68rem;font-weight:800;color:#8e8e8e;text-transform:uppercase;letter-spacing:.07em">Sensaciones
+                <textarea rows="2" placeholder="Clima, terreno, cómo te sentiste…" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#f4f3ef;padding:12px 13px;border-radius:14px;font-size:.95rem;resize:vertical"></textarea>
+              </label>
+            </div>
+          </sc-if>
+
+          <button style="width:100%;margin-top:18px;background:linear-gradient(135deg,#ff7a1a,#b6ff2e);color:#0b0c0f;border:none;padding:15px 20px;border-radius:14px;font-family:'Space Grotesk',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;min-height:50px;box-shadow:0 8px 24px rgba(255,122,26,.26)" style-hover="filter:brightness(1.05)">Guardar entreno</button>
+        </div>
+
+        <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:22px;padding:22px">
+          <h2 style="margin:0 0 16px;font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700">Últimos entrenos</h2>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{ listaRunning }}" as="e" hint-placeholder-count="5">
+              <div style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:14px 16px" style-hover="border-color:rgba(255,122,26,.5)">
+                <span style="width:8px;height:8px;border-radius:999px;flex-shrink:0;background:{{ e.dot }}"></span>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:.66rem;color:#8e8e8e;font-weight:800;text-transform:uppercase;letter-spacing:.07em">{{ e.fecha }} · {{ e.tipo }}</div>
+                  <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;margin-top:3px">{{ e.titulo }}</div>
+                  <div style="font-size:.79rem;color:#8e8e8e;margin-top:2px">{{ e.detalle }}</div>
+                </div>
+                <span style="font-size:.62rem;font-weight:800;padding:4px 9px;border-radius:999px;background:{{ e.zonaBg }};color:{{ e.zonaFg }};flex-shrink:0">{{ e.zona }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ FUERZA ============ -->
+    <sc-if value="{{ esFuerza }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:22px;padding:22px">
+          <h2 style="margin:0 0 4px;font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700">Sesión de fuerza</h2>
+          <p style="margin:0 0 18px;color:#8e8e8e;font-size:.78rem">Añade ejercicios uno a uno y guarda la sesión entera al final.</p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px">
+            <label style="grid-column:1/-1;display:flex;flex-direction:column;gap:7px;font-size:.68rem;font-weight:800;color:#8e8e8e;text-transform:uppercase;letter-spacing:.07em">Ejercicio
+              <input type="text" placeholder="Sentadilla, press banca…" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#f4f3ef;padding:12px 13px;border-radius:14px;font-size:.95rem;min-height:46px">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:7px;font-size:.68rem;font-weight:800;color:#8e8e8e;text-transform:uppercase;letter-spacing:.07em">Series
+              <input type="number" value="3" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#f4f3ef;padding:12px 13px;border-radius:14px;font-size:.95rem;min-height:46px">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:7px;font-size:.68rem;font-weight:800;color:#8e8e8e;text-transform:uppercase;letter-spacing:.07em">Reps
+              <input type="number" value="10" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#f4f3ef;padding:12px 13px;border-radius:14px;font-size:.95rem;min-height:46px">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:7px;font-size:.68rem;font-weight:800;color:#8e8e8e;text-transform:uppercase;letter-spacing:.07em">Peso (kg)
+              <input type="number" step="0.5" placeholder="60" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#f4f3ef;padding:12px 13px;border-radius:14px;font-size:.95rem;min-height:46px">
+            </label>
+          </div>
+          <button style="width:100%;margin-top:16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#f4f3ef;padding:14px;border-radius:14px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;min-height:48px" style-hover="border-color:rgba(255,122,26,.5)">Añadir ejercicio a la sesión</button>
+
+          <p style="margin:20px 0 10px;font-size:.68rem;font-weight:800;color:#8e8e8e;text-transform:uppercase;letter-spacing:.07em">En esta sesión</p>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{ pendientes }}" as="p" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:13px 16px">
+                <div style="flex:1;min-width:0">
+                  <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.92rem">{{ p.titulo }}</div>
+                  <div style="font-size:.76rem;color:#8e8e8e;margin-top:2px">{{ p.detalle }}</div>
+                </div>
+                <span style="font-family:'Space Grotesk',sans-serif;font-size:.8rem;font-weight:700;color:#b6ff2e">{{ p.volumen }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <button style="width:100%;margin-top:16px;background:linear-gradient(135deg,#ff7a1a,#b6ff2e);color:#0b0c0f;border:none;padding:15px;border-radius:14px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.95rem;cursor:pointer;min-height:50px;box-shadow:0 8px 24px rgba(255,122,26,.26)">Guardar sesión completa</button>
+        </div>
+
+        <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:22px;padding:22px">
+          <h2 style="margin:0 0 4px;font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700">Progresión por ejercicio</h2>
+          <p style="margin:0 0 14px;color:#8e8e8e;font-size:.78rem">Peso máximo y 1RM estimado — {{ progresion.ejercicio }}</p>
+          <div style="display:flex;gap:8px;overflow-x:auto;margin-bottom:16px;scrollbar-width:none">
+            <sc-for list="{{ progresion.opciones }}" as="o" hint-placeholder-count="4">
+              <button onClick="{{ o.go }}" style="flex:0 0 auto;border-radius:999px;padding:9px 16px;font-size:.8rem;font-weight:700;cursor:pointer;min-height:42px;white-space:nowrap;border:1px solid {{ o.bc }};background:{{ o.bg }};color:{{ o.fg }}">{{ o.nombre }}</button>
+            </sc-for>
+          </div>
+          <svg viewBox="0 0 620 250" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;overflow:visible;display:block">
+            <sc-for list="{{ progresion.grid }}" as="g" hint-placeholder-count="4">
+              <g>
+                <line x1="44" y1="{{ g.y }}" x2="600" y2="{{ g.y }}" stroke="rgba(255,255,255,.06)" stroke-width="1"></line>
+                <text x="38" y="{{ g.ty }}" text-anchor="end" fill="#6f6f6f" font-size="10" font-weight="700">{{ g.label }}</text>
+              </g>
+            </sc-for>
+            <path d="{{ progresion.rmPath }}" fill="none" stroke="rgba(182,255,46,.55)" stroke-width="2" stroke-dasharray="5 5"></path>
+            <path d="{{ progresion.areaPath }}" fill="rgba(255,122,26,.13)"></path>
+            <path d="{{ progresion.linePath }}" fill="none" stroke="#ff7a1a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+            <sc-for list="{{ progresion.puntos }}" as="p" hint-placeholder-count="6">
+              <g>
+                <circle cx="{{ p.x }}" cy="{{ p.y }}" r="4" fill="#0b0c0f" stroke="#ff7a1a" stroke-width="2.5"></circle>
+                <text x="{{ p.x }}" y="242" text-anchor="middle" fill="#6f6f6f" font-size="10" font-weight="700">{{ p.label }}</text>
+              </g>
+            </sc-for>
+          </svg>
+          <div style="display:flex;gap:18px;margin-top:6px;font-size:.7rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase">
+            <span style="color:#ff7a1a">— Peso levantado</span>
+            <span style="color:#b6ff2e">·· 1RM estimado</span>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ SEMANA ============ -->
+    <sc-if value="{{ esSemana }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:22px;padding:22px">
+          <h2 style="margin:0 0 4px;font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700">Check-in semanal</h2>
+          <p style="margin:0 0 18px;color:#8e8e8e;font-size:.78rem">Una vez por semana. Los campos que la app puede calcular vienen ya rellenos.</p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px">
+            <sc-for list="{{ camposSemana }}" as="c" hint-placeholder-count="6">
+              <label style="display:flex;flex-direction:column;gap:7px;font-size:.68rem;font-weight:800;color:#8e8e8e;text-transform:uppercase;letter-spacing:.07em">{{ c.label }}
+                <input type="text" value="{{ c.valor }}" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#f4f3ef;padding:12px 13px;border-radius:14px;font-size:.95rem;min-height:46px">
+                <span style="font-size:.68rem;font-weight:700;text-transform:none;letter-spacing:0;color:{{ c.hintColor }}">{{ c.hint }}</span>
+              </label>
+            </sc-for>
+            <label style="grid-column:1/-1;display:flex;flex-direction:column;gap:7px;font-size:.68rem;font-weight:800;color:#8e8e8e;text-transform:uppercase;letter-spacing:.07em">Algo destacable
+              <textarea rows="2" placeholder="Lo que quieras recordar de esta semana…" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#f4f3ef;padding:12px 13px;border-radius:14px;font-size:.95rem;resize:vertical"></textarea>
+            </label>
+          </div>
+          <button style="width:100%;margin-top:18px;background:linear-gradient(135deg,#ff7a1a,#b6ff2e);color:#0b0c0f;border:none;padding:15px;border-radius:14px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.95rem;cursor:pointer;min-height:50px;box-shadow:0 8px 24px rgba(255,122,26,.26)">Guardar check-in</button>
+        </div>
+
+        <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:22px;padding:22px">
+          <h2 style="margin:0 0 16px;font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700">Semanas anteriores</h2>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{ listaSemanas }}" as="s" hint-placeholder-count="4">
+              <div style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:14px 16px">
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:.66rem;color:#8e8e8e;font-weight:800;text-transform:uppercase;letter-spacing:.07em">Semana del {{ s.fecha }}</div>
+                  <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;margin-top:3px">{{ s.titulo }}</div>
+                  <div style="font-size:.79rem;color:#8e8e8e;margin-top:2px">{{ s.detalle }}</div>
+                </div>
+                <span style="font-family:'Space Grotesk',sans-serif;font-size:.9rem;font-weight:700;flex-shrink:0;color:{{ s.color }}">{{ s.cumplido }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ HISTORIAL ============ -->
+    <sc-if value="{{ esHistorial }}" hint-placeholder-val="{{ false }}">
+      <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:22px;padding:22px">
+        <h2 style="margin:0 0 16px;font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700">Historial completo</h2>
+        <div style="display:flex;gap:8px;overflow-x:auto;margin-bottom:18px;scrollbar-width:none">
+          <sc-for list="{{ filtros }}" as="f" hint-placeholder-count="3">
+            <button onClick="{{ f.go }}" style="flex:0 0 auto;border-radius:999px;padding:9px 16px;font-size:.8rem;font-weight:700;cursor:pointer;min-height:42px;white-space:nowrap;border:1px solid {{ f.bc }};background:{{ f.bg }};color:{{ f.fg }}">{{ f.label }}</button>
+          </sc-for>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <sc-for list="{{ historial }}" as="h" hint-placeholder-count="8">
+            <div style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:13px 16px">
+              <span style="font-size:.62rem;font-weight:800;padding:4px 10px;border-radius:999px;flex-shrink:0;background:{{ h.badgeBg }};color:{{ h.badgeFg }}">{{ h.badge }}</span>
+              <div style="flex:1;min-width:0">
+                <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.92rem">{{ h.titulo }}</div>
+                <div style="font-size:.76rem;color:#8e8e8e;margin-top:2px">{{ h.fecha }}</div>
+              </div>
+              <span style="font-size:.79rem;color:#8e8e8e;flex-shrink:0">{{ h.extra }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ CUENTA / SINCRONIZACIÓN ============ -->
+    <sc-if value="{{ esCuenta }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:22px;padding:22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <span style="width:52px;height:52px;border-radius:999px;background:rgba(255,122,26,.18);color:#ff7a1a;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.1rem">{{ usuario.inicial }}</span>
+          <div style="flex:1;min-width:180px">
+            <div style="font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:700">{{ usuario.nombre }}</div>
+            <div style="color:#8e8e8e;font-size:.8rem">{{ usuario.email }} · {{ usuario.desde }}</div>
+          </div>
+          <button style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#f4f3ef;padding:12px 18px;border-radius:14px;font-weight:700;font-size:.85rem;cursor:pointer;min-height:46px" style-hover="border-color:rgba(255,92,92,.5);color:#ff5c5c">Cerrar sesión</button>
+        </div>
+
+        <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:22px;padding:22px">
+          <h2 style="margin:0 0 4px;font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700">Importar entrenos</h2>
+          <p style="margin:0 0 18px;color:#8e8e8e;font-size:.78rem">Conecta un reloj o app y los entrenos de running entran solos, con FC y ritmo.</p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px">
+            <sc-for list="{{ fuentes }}" as="f" hint-placeholder-count="3">
+              <div style="border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:18px;background:rgba(255,255,255,.02);display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+                  <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.95rem">{{ f.nombre }}</span>
+                  <span style="font-size:.62rem;font-weight:800;padding:4px 9px;border-radius:999px;background:{{ f.chipBg }};color:{{ f.chipFg }}">{{ f.estado }}</span>
+                </div>
+                <p style="margin:0;color:#8e8e8e;font-size:.78rem;flex:1">{{ f.detalle }}</p>
+                <button onClick="{{ f.go }}" style="width:100%;padding:12px;border-radius:13px;font-weight:700;font-size:.85rem;cursor:pointer;min-height:46px;border:1px solid {{ f.btnBc }};background:{{ f.btnBg }};color:{{ f.btnFg }}">{{ f.accion }}</button>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:22px;padding:22px">
+          <h2 style="margin:0 0 4px;font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700">Tus datos</h2>
+          <p style="margin:0 0 16px;color:#8e8e8e;font-size:.78rem">Guardados en la nube y ligados a tu cuenta: nadie más los ve.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#f4f3ef;padding:12px 18px;border-radius:14px;font-weight:700;font-size:.85rem;cursor:pointer;min-height:46px" style-hover="border-color:rgba(255,122,26,.5)">Exportar copia (.json)</button>
+            <button style="background:rgba(255,92,92,.08);border:1px solid rgba(255,92,92,.25);color:#ff5c5c;padding:12px 18px;border-radius:14px;font-weight:700;font-size:.85rem;cursor:pointer;min-height:46px" style-hover="background:rgba(255,92,92,.16)">Borrar todos los datos</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+  </main>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;objetivoSemanalKm&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:42,&quot;tsType&quot;:&quot;number&quot;,&quot;min&quot;:10,&quot;max&quot;:120,&quot;unit&quot;:&quot;km&quot;,&quot;section&quot;:&quot;Objetivos&quot;},&quot;nombreUsuario&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Álex&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Cuenta&quot;}}">
+class Component extends DCLogic {
+  state = { tab: 'resumen', filtro: 'todos', ejercicio: 'Sentadilla', rpe: 6, avanzado: false };
+
+  runs() {
+    return [
+      { f: '2026-07-21', tipo: 'Rodaje', km: 8.2, min: 46.5, fc: 142 },
+      { f: '2026-07-24', tipo: 'Series', km: 6.5, min: 33.0, fc: 168 },
+      { f: '2026-07-27', tipo: 'Largo', km: 14.0, min: 82.0, fc: 148 },
+      { f: '2026-08-01', tipo: 'Tempo', km: 9.0, min: 45.5, fc: 161 },
+      { f: '2026-08-04', tipo: 'Largo', km: 16.0, min: 92.0, fc: 149 },
+      { f: '2026-08-09', tipo: 'Series', km: 7.2, min: 35.6, fc: 170 },
+      { f: '2026-08-12', tipo: 'Largo', km: 18.0, min: 100.5, fc: 150 },
+      { f: '2026-08-19', tipo: 'Tempo', km: 10.0, min: 48.5, fc: 163 },
+      { f: '2026-08-22', tipo: 'Largo', km: 19.5, min: 106.0, fc: 151 },
+      { f: '2026-08-26', tipo: 'Rodaje', km: 9.0, min: 49.0, fc: 141 },
+      { f: '2026-08-30', tipo: 'Series', km: 8.0, min: 38.4, fc: 172 },
+      { f: '2026-09-01', tipo: 'Rodaje', km: 7.5, min: 41.0, fc: 139 }
+    ];
+  }
+
+  fmtFecha(iso) { const [a, m, d] = iso.split('-'); return `${d}/${m}`; }
+  ritmo(km, min) { return min / km; }
+  fmtRitmo(v) { const m = Math.floor(v), s = Math.round((v - m) * 60); return `${m}:${String(s).padStart(2, '0')}`; }
+
+  zonaDe(fc) {
+    if (fc >= 170) return { n: 'Z5', bg: 'rgba(255,92,92,.16)', fg: '#ff8f8f' };
+    if (fc >= 160) return { n: 'Z4', bg: 'rgba(255,122,26,.16)', fg: '#ff7a1a' };
+    if (fc >= 145) return { n: 'Z3', bg: 'rgba(255,205,80,.14)', fg: '#ffcd50' };
+    return { n: 'Z2', bg: 'rgba(182,255,46,.14)', fg: '#b6ff2e' };
+  }
+
+  renderVals() {
+    const S = this.state;
+    const meta = this.props.objetivoSemanalKm ?? 42;
+    const runs = this.runs();
+    const set = k => () => this.setState({ tab: k });
+
+    const tabDefs = [
+      ['resumen', 'Resumen'], ['records', 'Récords'], ['running', 'Running'],
+      ['fuerza', 'Fuerza'], ['semana', 'Semana'], ['historial', 'Historial'], ['cuenta', 'Cuenta']
+    ];
+    const tabs = tabDefs.map(([id, label]) => {
+      const on = S.tab === id;
+      return { id, label, go: set(id),
+        bg: on ? 'linear-gradient(135deg,#ff7a1a,#b6ff2e)' : 'rgba(255,255,255,.05)',
+        fg: on ? '#0b0c0f' : '#c2c2c2',
+        bc: on ? 'transparent' : 'rgba(255,255,255,.07)' };
+    });
+
+    // --- combo chart: km/semana (barras) + ritmo medio semanal (línea)
+    const semanas = [
+      { label: '21 jul', km: 28.7, ritmo: 5.67 },
+      { label: '28 jul', km: 23.0, ritmo: 5.61 },
+      { label: '4 ago', km: 30.5, ritmo: 5.55 },
+      { label: '11 ago', km: 34.4, ritmo: 5.49 },
+      { label: '18 ago', km: 38.6, ritmo: 5.43 },
+      { label: '25 ago', km: 41.2, ritmo: 5.35 },
+      { label: '1 sep', km: 37.8, ritmo: 5.28 }
+    ];
+    const L = 46, R = 600, T = 24, B = 244, W = R - L, H = B - T;
+    const maxKm = Math.max(meta, ...semanas.map(s => s.km)) * 1.12;
+    const paso = W / semanas.length, bw = Math.min(46, paso * 0.52);
+    const barras = semanas.map((s, i) => {
+      const h = (s.km / maxKm) * H;
+      const x = L + i * paso + (paso - bw) / 2;
+      return { x, w: bw, h: Math.max(h, 2), y: B - h, cx: x + bw / 2, vy: B - h - 7, val: `${s.km}`, label: s.label };
+    });
+    const rs = semanas.map(s => s.ritmo);
+    const rMin = Math.min(...rs) - 0.14, rMax = Math.max(...rs) + 0.14;
+    const px = i => L + i * paso + paso / 2;
+    const py = v => T + 14 + (1 - (v - rMin) / (rMax - rMin)) * (H - 46);
+    const coords = semanas.map((s, i) => [px(i), py(s.ritmo)]);
+    const linePath = 'M ' + coords.map(c => `${c[0].toFixed(1)},${c[1].toFixed(1)}`).join(' L ');
+    const goalY = B - (meta / maxKm) * H;
+    const last = coords[coords.length - 1];
+    const combo = {
+      barras, linePath,
+      areaPath: `${linePath} L ${last[0].toFixed(1)},${B} L ${coords[0][0].toFixed(1)},${B} Z`,
+      puntos: coords.map(c => ({ x: c[0], y: c[1] })),
+      grid: [0, 0.25, 0.5, 0.75].map(t => {
+        const y = B - t * H;
+        return { y, ty: y + 3.5, label: `${Math.round(t * maxKm)}km` };
+      }),
+      goalPath: `M ${L} ${goalY.toFixed(1)} L ${R} ${goalY.toFixed(1)}`,
+      goalTy: goalY - 7, goalLabel: `${meta} KM`,
+      tagX: last[0] - 78, tagY: last[1] - 30, tagTx: last[0] - 41, tagTy: last[1] - 14,
+      tagLabel: `${this.fmtRitmo(semanas[semanas.length - 1].ritmo)} /km`
+    };
+
+    // --- volumen fuerza
+    const vols = [3120, 3480, 3300, 3960, 4210, 4050, 4620, 4880];
+    const labelsV = ['22/7', '26/7', '31/7', '5/8', '11/8', '18/8', '25/8', '31/8'];
+    const maxV = Math.max(...vols) * 1.15;
+    const volumen = {
+      barras: vols.map((v, i) => {
+        const paso2 = 540 / vols.length, bw2 = Math.min(38, paso2 * 0.55);
+        const h = (v / maxV) * 150;
+        const x = 12 + i * paso2 + (paso2 - bw2) / 2;
+        return { x, w: bw2, h, y: 188 - h, cx: x + bw2 / 2, vy: 188 - h - 7,
+          val: `${(v / 1000).toFixed(1)}t`, label: labelsV[i],
+          fill: i === vols.length - 1 ? '#ff7a1a' : 'rgba(255,122,26,.35)' };
+      })
+    };
+
+    // --- zonas FC
+    const zdef = [
+      ['Z1 Recuperación', '< 130 ppm', 6, '#5c7cff', '0:52'],
+      ['Z2 Aeróbico', '130-144', 44, '#b6ff2e', '6:18'],
+      ['Z3 Tempo', '145-159', 28, '#ffcd50', '4:02'],
+      ['Z4 Umbral', '160-172', 17, '#ff7a1a', '2:26'],
+      ['Z5 VO2máx', '> 172 ppm', 5, '#ff5c5c', '0:43']
+    ];
+    const zonas = {
+      subtitulo: 'Reparto del tiempo en carrera — últimos 30 días (14h 21min)',
+      lista: zdef.map(([nombre, rango, pct, color, tiempo]) => ({ nombre, rango, pct: `${pct}%`, color, tiempo: `${tiempo} h` }))
+    };
+
+    // --- resumen cards / racha / objetivos
+    const diasLabel = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+    const hechos = [1, 1, 0, 1, 1, 1, 0];
+    const racha = {
+      semanas: 6,
+      dias: diasLabel.map((label, i) => ({ label,
+        bg: hechos[i] ? 'linear-gradient(180deg,rgba(255,122,26,.55),rgba(255,122,26,.18))' : 'rgba(255,255,255,.04)',
+        bc: hechos[i] ? 'rgba(255,122,26,.5)' : 'rgba(255,255,255,.07)' }))
+    };
+    const kmSem = 37.8;
+    const objetivos = {
+      resumen: `${Math.round((kmSem / meta) * 100)}% completado`,
+      lista: [
+        { nombre: 'Kilómetros', valor: `${kmSem} / ${meta} km`, pct: `${Math.min(100, (kmSem / meta) * 100)}%`, color: 'linear-gradient(90deg,#ff7a1a,#b6ff2e)' },
+        { nombre: 'Sesiones', valor: '5 / 6', pct: '83%', color: '#ff7a1a' },
+        { nombre: 'Fuerza', valor: '2 / 2', pct: '100%', color: '#b6ff2e' }
+      ]
+    };
+    const cards = [
+      { valor: '5:28', etiqueta: 'Ritmo medio', sub: '−9 s vs. mes pasado', color: '#ff7a1a' },
+      { valor: '218,9', etiqueta: 'Km acumulados', sub: '7 semanas seguidas', color: '#f4f3ef' },
+      { valor: '14', etiqueta: 'Sesiones fuerza', sub: '4,9 t movidas', color: '#b6ff2e' },
+      { valor: '0/10', etiqueta: 'Rodilla', sub: 'Sin molestias en 3 semanas', color: '#f4f3ef' }
+    ];
+
+    // --- récords
+    const chipNuevo = { chip: 'Nuevo', chipBg: 'rgba(182,255,46,.16)', chipFg: '#b6ff2e' };
+    const chipViejo = { chip: 'Estable', chipBg: 'rgba(255,255,255,.06)', chipFg: '#8e8e8e' };
+    const records = [
+      { distancia: '1 km', tiempo: '4:12', ritmo: '4:12 /km', fecha: '30 ago', ...chipNuevo },
+      { distancia: '5 km', tiempo: '23:48', ritmo: '4:46 /km', fecha: '19 ago', ...chipNuevo },
+      { distancia: '10 km', tiempo: '50:22', ritmo: '5:02 /km', fecha: '4 ago', ...chipViejo },
+      { distancia: 'Media maratón', tiempo: '1:52:30', ritmo: '5:20 /km', fecha: '22 ago', ...chipNuevo }
+    ];
+    const metas = [
+      { nombre: 'Bajar de 50:00 en 10 km', estado: 'En camino', estadoColor: '#b6ff2e', pct: '78%', color: 'linear-gradient(90deg,#ff7a1a,#b6ff2e)', detalle: 'Faltan 22 s. A tu ritmo de mejora, en ~3 semanas.' },
+      { nombre: 'Media maratón en 1:45', estado: 'Ajustado', estadoColor: '#ffcd50', pct: '52%', color: '#ff7a1a', detalle: 'Necesitas 5:00 /km sostenido; hoy vas a 5:20.' },
+      { nombre: '160 km en septiembre', estado: 'Empezando', estadoColor: '#8e8e8e', pct: '5%', color: '#b6ff2e', detalle: '7,5 de 160 km. Hacen falta 38 km por semana.' }
+    ];
+
+    // --- listas
+    const listaRunning = [...runs].reverse().slice(0, 5).map(e => {
+      const z = this.zonaDe(e.fc);
+      return { fecha: this.fmtFecha(e.f), tipo: e.tipo,
+        titulo: `${e.km} km · ${this.fmtRitmo(this.ritmo(e.km, e.min))} /km`,
+        detalle: `${Math.round(e.min)} min · FC media ${e.fc} ppm`,
+        dot: e.tipo === 'Series' ? '#ff5c5c' : e.tipo === 'Largo' ? '#b6ff2e' : '#ff7a1a',
+        zona: z.n, zonaBg: z.bg, zonaFg: z.fg };
+    });
+
+    const pendientes = [
+      { titulo: 'Sentadilla — 4×8', detalle: '85 kg · RPE 8', volumen: '2 720 kg' },
+      { titulo: 'Peso muerto — 3×6', detalle: '100 kg · técnica ok', volumen: '1 800 kg' },
+      { titulo: 'Zancadas — 3×12', detalle: '24 kg mancuernas', volumen: '864 kg' }
+    ];
+
+    const ejercicios = ['Sentadilla', 'Peso muerto', 'Press banca', 'Dominadas'];
+    const seriesEj = {
+      'Sentadilla': [[ '22/7', 70 ], ['31/7', 75], ['11/8', 78], ['18/8', 80], ['25/8', 82.5], ['31/8', 85]],
+      'Peso muerto': [['22/7', 90], ['31/7', 92.5], ['11/8', 95], ['18/8', 97.5], ['25/8', 100], ['31/8', 100]],
+      'Press banca': [['22/7', 55], ['31/7', 57.5], ['11/8', 57.5], ['18/8', 60], ['25/8', 62.5], ['31/8', 62.5]],
+      'Dominadas': [['22/7', 0], ['31/7', 2.5], ['11/8', 5], ['18/8', 5], ['25/8', 7.5], ['31/8', 10]]
+    };
+    const datosEj = seriesEj[S.ejercicio] || seriesEj['Sentadilla'];
+    const pl = 44, pr = 600, pt = 20, pb = 218;
+    const vals = datosEj.map(d => d[1]);
+    const rm = vals.map(v => v * 1.08);
+    const pMax = Math.max(...rm) * 1.08, pMin = Math.max(0, Math.min(...vals) - Math.max(...vals) * 0.25);
+    const ex = i => pl + (i / (datosEj.length - 1)) * (pr - pl);
+    const ey = v => pt + (1 - (v - pMin) / (pMax - pMin)) * (pb - pt);
+    const ec = datosEj.map((d, i) => [ex(i), ey(d[1])]);
+    const eLine = 'M ' + ec.map(c => `${c[0].toFixed(1)},${c[1].toFixed(1)}`).join(' L ');
+    const progresion = {
+      ejercicio: S.ejercicio,
+      opciones: ejercicios.map(nombre => {
+        const on = S.ejercicio === nombre;
+        return { nombre, go: () => this.setState({ ejercicio: nombre }),
+          bg: on ? 'rgba(255,122,26,.18)' : 'rgba(255,255,255,.04)',
+          fg: on ? '#ff7a1a' : '#8e8e8e',
+          bc: on ? 'rgba(255,122,26,.45)' : 'rgba(255,255,255,.07)' };
+      }),
+      grid: [0, 0.33, 0.66, 1].map(t => {
+        const y = pb - t * (pb - pt);
+        return { y, ty: y + 3.5, label: `${Math.round(pMin + t * (pMax - pMin))}kg` };
+      }),
+      linePath: eLine,
+      areaPath: `${eLine} L ${ec[ec.length - 1][0].toFixed(1)},${pb} L ${ec[0][0].toFixed(1)},${pb} Z`,
+      rmPath: 'M ' + rm.map((v, i) => `${ex(i).toFixed(1)},${ey(v).toFixed(1)}`).join(' L '),
+      puntos: ec.map((c, i) => ({ x: c[0], y: c[1], label: datosEj[i][0] }))
+    };
+
+    const camposSemana = [
+      { label: 'Semana del', valor: '31/08/2026', hint: 'Lunes de esta semana', hintColor: '#6f6f6f' },
+      { label: 'Peso (kg)', valor: '73,8', hint: '−0,4 kg vs. semana pasada', hintColor: '#b6ff2e' },
+      { label: 'Km de carrera', valor: '37,8', hint: 'Calculado de tus entrenos', hintColor: '#ff7a1a' },
+      { label: 'Sesiones', valor: '5 de 6', hint: 'Calculado de tus entrenos', hintColor: '#ff7a1a' },
+      { label: 'Sueño medio (h)', valor: '7,2', hint: 'Escríbelo tú', hintColor: '#6f6f6f' },
+      { label: 'Fatiga (0-10)', valor: '4', hint: 'Escríbelo tú', hintColor: '#6f6f6f' }
+    ];
+
+    const listaSemanas = [
+      { fecha: '24/08', titulo: '41,2 km · 6 de 6 sesiones', detalle: 'Sueño 7,5 h · fatiga 5/10 · fuerza sí', cumplido: '98%', color: '#b6ff2e' },
+      { fecha: '17/08', titulo: '38,6 km · 5 de 6 sesiones', detalle: 'Sueño 6,9 h · fatiga 6/10 · fuerza sí', cumplido: '92%', color: '#b6ff2e' },
+      { fecha: '10/08', titulo: '34,4 km · 5 de 6 sesiones', detalle: 'Sueño 7,1 h · fatiga 4/10 · fuerza sí', cumplido: '82%', color: '#ffcd50' },
+      { fecha: '03/08', titulo: '30,5 km · 4 de 5 sesiones', detalle: 'Sueño 6,4 h · fatiga 7/10 · fuerza no', cumplido: '73%', color: '#ffcd50' }
+    ];
+
+    const todo = [
+      ...runs.map(e => ({ tipo: 'running', fecha: e.f,
+        titulo: `${e.km} km · ${e.tipo}`, extra: `${this.fmtRitmo(this.ritmo(e.km, e.min))} /km` })),
+      { tipo: 'fuerza', fecha: '2026-08-31', titulo: 'Sentadilla — 4×8 @ 85 kg', extra: '2 720 kg' },
+      { tipo: 'fuerza', fecha: '2026-08-25', titulo: 'Peso muerto — 3×6 @ 100 kg', extra: '1 800 kg' },
+      { tipo: 'fuerza', fecha: '2026-08-18', titulo: 'Press banca — 4×8 @ 60 kg', extra: '1 920 kg' }
+    ].sort((a, b) => b.fecha.localeCompare(a.fecha));
+    const historial = todo
+      .filter(e => S.filtro === 'todos' || e.tipo === S.filtro)
+      .map(e => ({ titulo: e.titulo, extra: e.extra, fecha: this.fmtFecha(e.fecha) + '/2026',
+        badge: e.tipo === 'running' ? 'Running' : 'Fuerza',
+        badgeBg: e.tipo === 'running' ? 'rgba(255,122,26,.16)' : 'rgba(182,255,46,.16)',
+        badgeFg: e.tipo === 'running' ? '#ff7a1a' : '#b6ff2e' }));
+
+    const filtros = [['todos', 'Todos'], ['running', 'Running'], ['fuerza', 'Fuerza']].map(([id, label]) => {
+      const on = S.filtro === id;
+      return { label, go: () => this.setState({ filtro: id }),
+        bg: on ? 'rgba(255,122,26,.18)' : 'rgba(255,255,255,.04)',
+        fg: on ? '#ff7a1a' : '#8e8e8e',
+        bc: on ? 'rgba(255,122,26,.45)' : 'rgba(255,255,255,.07)' };
+    });
+
+    const conectado = { estado: 'Conectado', chipBg: 'rgba(182,255,46,.16)', chipFg: '#b6ff2e',
+      accion: 'Sincronizar ahora', btnBg: 'rgba(255,255,255,.06)', btnFg: '#f4f3ef', btnBc: 'rgba(255,255,255,.1)' };
+    const suelto = { estado: 'Sin conectar', chipBg: 'rgba(255,255,255,.06)', chipFg: '#8e8e8e',
+      accion: 'Conectar', btnBg: 'linear-gradient(135deg,#ff7a1a,#b6ff2e)', btnFg: '#0b0c0f', btnBc: 'transparent' };
+    const fuentes = [
+      { nombre: 'Strava', detalle: 'Última importación hace 2 h · 12 entrenos este mes', ...conectado, go: () => {} },
+      { nombre: 'Garmin Connect', detalle: 'Trae FC por segundo y zonas ya calculadas.', ...suelto, go: () => {} },
+      { nombre: 'Archivo .gpx / .fit', detalle: 'Sube una actividad suelta desde el reloj.', ...suelto, accion: 'Subir archivo', go: () => {} }
+    ];
+
+    return {
+      tabs, cards, racha, objetivos, combo, volumen, zonas, records, metas,
+      listaRunning, pendientes, progresion, camposSemana, listaSemanas, historial, filtros, fuentes,
+      ritmo: { tendencia: 'Tu ritmo medio semanal ha bajado 23 s/km en 7 semanas mientras subías volumen.' },
+      usuario: { nombre: this.props.nombreUsuario ?? 'Álex', inicial: (this.props.nombreUsuario ?? 'Álex').slice(0, 1).toUpperCase(), email: 'alex@correo.com', desde: 'desde marzo 2026' },
+      rpeEscala: Array.from({ length: 11 }, (_, n) => {
+        const on = S.rpe === n;
+        return { n, go: () => this.setState({ rpe: n }),
+          bg: on ? 'linear-gradient(135deg,#ff7a1a,#b6ff2e)' : 'rgba(255,255,255,.04)',
+          fg: on ? '#0b0c0f' : '#8e8e8e',
+          bc: on ? 'transparent' : 'rgba(255,255,255,.08)' };
+      }),
+      avanzado: S.avanzado,
+      avanzadoLabel: S.avanzado ? '− Ocultar FC, dolor y notas' : '+ FC, dolor y notas',
+      toggleAvanzado: () => this.setState({ avanzado: !S.avanzado }),
+      toggleCuenta: set('cuenta'),
+      esResumen: S.tab === 'resumen', esRecords: S.tab === 'records', esRunning: S.tab === 'running',
+      esFuerza: S.tab === 'fuerza', esSemana: S.tab === 'semana', esHistorial: S.tab === 'historial',
+      esCuenta: S.tab === 'cuenta'
+    };
+  }
+}
+</script>
+</body>
+</html>
